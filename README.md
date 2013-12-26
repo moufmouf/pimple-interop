@@ -28,7 +28,7 @@ echo $pimple->get('hello');
 
 Why the need for this package?
 ------------------------------
-This package is part of a long-term effort to bring interoperability between DI containers. The ultimate goal is to
+This package is part of a long-term effort to bring [interoperability between DI containers](https://github.com/container-interop/container-interop). The ultimate goal is to
 make sure that multiple containers can communicate together by sharing entries (one container might use an entry from another
 container, etc...)
 

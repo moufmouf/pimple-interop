@@ -1,0 +1,34 @@
+{
+	"name" : "mouf/pimple-interop",
+	"description" : "This project is a very simple extension to the Pimple microframework. It adds to Pimple compatibility with the container-interop APIs.",
+	"authors" : [{
+			"name" : "David Négrier",
+			"email" : "d.negrier@thecodingmachine.com",
+			"homepage" : "http://mouf-php.com"
+		}
+	],
+	"keywords" : [
+		"dependency injection",
+		"DI",
+		"Pimple",
+		"container-interop"
+	],
+	"homepage" : "http://mouf-php.com",
+	"license" : [
+		"MIT"
+	],
+	"require" : {
+		"container-interop/container-interop" : "dev-parentaware",
+		"pimple/pimple" : "~1.0"
+	},
+	"autoload" : {
+		"psr-0" : {
+			"Interop\\Container\\Pimple" : "src/"
+		}
+	},
+	"repositories" : [{
+			"type" : "git",
+			"url" : "git@github.com:moufmouf/container-interop.git"
+		}
+	]
+}

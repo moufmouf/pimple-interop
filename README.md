@@ -28,6 +28,13 @@ echo $pimple->get('hello');
 
 Why the need for this package?
 ------------------------------
+This package is part of a long-term effort to bring interoperability between DI containers. The ultimate goal is to
+make sure that multiple containers can communicate together by sharing entries (one container might use an entry from another
+container, etc...)
+
+
+But can't we already do this?
+-----------------------------
 The excellent [Acclimate](https://github.com/jeremeamia/acclimate-container) can already provide an adapter around Pimple.
 The adapter implements the `ReadableContainerInterface` (or a similar interface).
 

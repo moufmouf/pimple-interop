@@ -1,7 +1,7 @@
 <?php
 namespace Interop\Container\Pimple;
 
-use Interop\Container\ReadableContainerInterface;
+use Interop\Container\ContainerInterface;
 use Interop\Container\ParentAwareContainerInterface;
 
 /**
@@ -11,13 +11,47 @@ use Interop\Container\ParentAwareContainerInterface;
  * 
  * @author David Négrier <david@mouf-php.com>
  */
-class PimpleInterop extends \Pimple implements ReadableContainerInterface, ParentAwareContainerInterface {
+class PimpleInterop extends \Pimple implements ContainerInterface, ParentAwareContainerInterface {
 
 	/**
 	 * @var ContainerInterface
 	 */
 	protected $fallbackContainer;
-		
+	
+	/**
+	 * @var FallbackContainerAdapter
+	 */
+	protected $wrappedFallbackContainer;
+	
+	/**
+	 * The number of time this container was called recursively.
+	 * @var int
+	 */
+	protected $nbLoops = 0;
+	
+	const MODE_STANDARD_COMPLIANT = 1;
+	const MODE_ACT_AS_MASTER = 2;
+	
+	/**
+	 * 
+	 * @var int
+	 */
+	protected $mode = self::MODE_ACT_AS_MASTER;
+	
+	/**
+	 * Sets the mode of pimple-interop.
+	 * There are 2 possible modes:
+	 * 
+	 * - PimpleInterop::MODE_STANDARD_COMPLIANT => a mode that respects the container-interop standard.
+	 * - PimpleInterop::MODE_ACT_AS_MASTER => in this mode, if Pimple does not contain the requested
+	 *   identifier, it will query the fallback container.
+	 * 
+	 * @param int $mode
+	 */
+	public function setMode($mode) {
+		$this->mode = $mode;
+	}
+	
 	/**
 	 * Checks if a parameter or an object is set.
 	 *
@@ -27,16 +61,20 @@ class PimpleInterop extends \Pimple implements ReadableContainerInterface, Paren
 	 */
 	public function offsetExists($id)
 	{
-		$has = parent::offsetExists($id);
-		if ($has) {
-			return true;
+		if (!$this->fallbackContainer || $this->mode == self::MODE_STANDARD_COMPLIANT) {
+			return parent::offsetExists($id);
+		} elseif ($this->mode == self::MODE_ACT_AS_MASTER) {
+			if ($this->nbLoops != 0) {
+				return parent::offsetExists($id);
+			} else {
+				$this->nbLoops++;
+				$has = $this->fallbackContainer->has($id);
+				$this->nbLoops--;
+				return $has;
+			}
+		} else {
+			throw new \Exception("Invalid mode set");
 		}
-		
-		if ($this->fallbackContainer && $this->fallbackContainer->has($id)) {
-			return true;
-		}
-		
-		return false;
 	}
 	
 	/**
@@ -50,27 +88,43 @@ class PimpleInterop extends \Pimple implements ReadableContainerInterface, Paren
 	 */
 	public function offsetGet($id)
 	{
-		if (parent::offsetExists($id)) {
-			return parent::offsetGet($id);
+		if (!$this->fallbackContainer || $this->mode == self::MODE_STANDARD_COMPLIANT) {
+			try {
+				return parent::offsetGet($id);
+			} catch (\InvalidArgumentException $e) {
+				// To respect container-interop, let's wrap the exception.
+				throw new PimpleNotFoundException($e->getMessage(), $e->getCode(), $e);
+			}
+		} elseif ($this->mode == self::MODE_ACT_AS_MASTER) {
+			if ($this->nbLoops != 0) {
+				if (!array_key_exists($id, $this->values)) {
+					throw new PimpleNotFoundException(sprintf('Identifier "%s" is not defined.', $id));
+				}
+				
+				$isFactory = is_object($this->values[$id]) && method_exists($this->values[$id], '__invoke');
+				
+				return $isFactory ? $this->values[$id]($this->wrappedFallbackContainer) : $this->values[$id];
+				
+			} else {
+				$this->nbLoops++;
+				$instance = $this->fallbackContainer->get($id);
+				$this->nbLoops--;
+				return $instance;
+			}
+		} else {
+			throw new \Exception("Invalid mode set");
 		}
-		
-		// Let's search in the fallback container:
-		if ($this->fallbackContainer && $this->fallbackContainer->has($id)) {
-			return $this->fallbackContainer->get($id);
-		}
-		
-		throw new PimpleNotFoundException(sprintf('Identifier "%s" is not defined.', $id));
 	}
 	
 	/* (non-PHPdoc)
-	 * @see \Interop\Container\ReadableContainerInterface::get()
+	 * @see \Interop\Container\ContainerInterface::get()
 	 */
 	public function get($identifier) {
 		return $this->offsetGet($identifier);
 	}
 
 	/* (non-PHPdoc)
-	 * @see \Interop\Container\ReadableContainerInterface::has()
+	 * @see \Interop\Container\ContainerInterface::has()
 	 */
 	public function has($identifier) {
 		return $this->offsetExists($identifier);
@@ -79,7 +133,8 @@ class PimpleInterop extends \Pimple implements ReadableContainerInterface, Paren
 	/* (non-PHPdoc)
 	 * @see \Interop\Container\ParentAwareContainerInterface::setParentContainer()
 	 */
-	public function setParentContainer(ReadableContainerInterface $container) {
+	public function setParentContainer(ContainerInterface $container) {
 		$this->fallbackContainer = $container;
+		$this->wrappedFallbackContainer = new FallbackContainerAdapter($container);
 	}
 }

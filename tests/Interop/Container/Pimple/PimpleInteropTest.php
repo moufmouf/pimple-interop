@@ -36,8 +36,7 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		$pimpleParent = new PimpleInterop();
 		$pimpleParent['hello'] = 'world';
 		
-		$pimple = new PimpleInterop();
-		$pimple->setParentContainer($pimpleParent);
+		$pimple = new PimpleInterop($pimpleParent);
 		
 		$this->assertEquals('world', $pimple->get('hello'));
 		$this->assertTrue($pimple->has('hello'));
@@ -60,8 +59,7 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 	{
 		$pimpleParent = new PimpleInterop();
 		
-		$pimple = new PimpleInterop();
-		$pimple->setParentContainer($pimpleParent);
+		$pimple = new PimpleInterop($pimpleParent);
 		
 		$pimple->get('hello');
 	}
@@ -70,11 +68,9 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		$pimpleGrandParent = new PimpleInterop();
 		$pimpleGrandParent['hello'] = 'world';
 		
-		$pimpleParent = new PimpleInterop();
-		$pimpleParent->setParentContainer($pimpleGrandParent);
+		$pimpleParent = new PimpleInterop($pimpleGrandParent);
 				
-		$pimple = new PimpleInterop();
-		$pimple->setParentContainer($pimpleParent);
+		$pimple = new PimpleInterop($pimpleParent);
 		
 		$this->assertEquals('world', $pimple->get('hello'));
 		$this->assertTrue($pimple->has('hello'));
@@ -89,8 +85,10 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		// My container references an instance in container A.
 		// This should work too.
 		
-		$pimpleA = new PimpleInterop();
-		$pimpleB = new PimpleInterop();
+		$compositeContainer = new CompositeContainer();
+		
+		$pimpleA = new PimpleInterop($compositeContainer);
+		$pimpleB = new PimpleInterop($compositeContainer);
 		
 		$pimpleB['controller'] = $pimpleB->share(function ($pimpleB) {
 			return ['result' => $pimpleB['dependency']];
@@ -100,10 +98,8 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 			return 'myDependency';
 		});
 		
-		$compositeContainer = new CompositeContainer([$pimpleA, $pimpleB]);
-		
-		$pimpleA->setParentContainer($compositeContainer);
-		$pimpleB->setParentContainer($compositeContainer);
+		$compositeContainer->addContainer($pimpleA);
+		$compositeContainer->addContainer($pimpleB);
 		
 		// Let's get the controller from the composite container
 		$controller = $compositeContainer->get('controller');
@@ -125,9 +121,11 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		// Silex will query container A but result of container B should be returned.
 		// My container references an instance in container A.
 		// This should work too.
-	
-		$pimpleA = new PimpleInterop();
-		$pimpleB = new PimpleInterop();
+
+		$compositeContainer = new CompositeContainer();
+		
+		$pimpleA = new PimpleInterop($compositeContainer);
+		$pimpleB = new PimpleInterop($compositeContainer);
 	
 		$pimpleB['controller'] = $pimpleB->share(function ($pimpleB) {
 			return ['result' => $pimpleB['dependency']];
@@ -137,10 +135,10 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 			return 'myDependency';
 		});
 
-		$compositeContainer = new CompositeContainer([$pimpleA, $pimpleB]);
 
-		$pimpleA->setParentContainer($compositeContainer);
-		$pimpleB->setParentContainer($compositeContainer);
+		$compositeContainer->addContainer($pimpleA);
+		$compositeContainer->addContainer($pimpleB);
+
 		$pimpleA->setMode(PimpleInterop::MODE_STANDARD_COMPLIANT);
 
 		// Let's get the controller from PimpleA (that does not declare it)

@@ -6,9 +6,10 @@ This package contains an extension to the Pimple DI container that makes Pimple 
 How to use it?
 --------------
 Instead of using the `Pimple` class, you can use the `PimpleInterop` class. This class extends `Pimple`.
-`PimpleInterop` implements `ContainerInterface` and `ParentAwareContainerInterface`. This means
-you can access your Pimple entries by using the `get` and `has` methods, and that you can chain containers
-using the `setParentContainer` method.
+`PimpleInterop` implements `ContainerInterface`. This means
+you can access your Pimple entries by using the `get` and `has` methods.
+`PimpleInterop` constructor accepts an optional "root" container as a first argument. This means you can chain `PimpleInterop` with
+another container. Dependencies will be fetched from the "root" container rather than from PimpleInterop.
 
 Here is a sample chaining 2 Pimple instances (in the real world, you would rather chain Pimple with another DI container,
 of course:
@@ -19,10 +20,12 @@ $pimpleParent = new PimpleInterop();
 $pimpleParent['hello'] = 'world';
 
 // Let's declare another container
-$pimple = new PimpleInterop();
-$pimple->setParentContainer($pimpleParent);
+$pimple = new PimpleInterop($pimpleParent);
+$pimple['test']->share(function(ContainerInterop $container) {
+	return "Hello ".$container->get('hello');
+});
 
-// Prints "world".
+// Prints "Hello world".
 echo $pimple->get('hello');
 ```
 
@@ -36,10 +39,10 @@ container, etc...)
 But can't we already do this?
 -----------------------------
 The excellent [Acclimate](https://github.com/jeremeamia/acclimate-container) can already provide an adapter around Pimple.
-The adapter implements the `ContainerInterface` (or a similar interface).
+The adapter implements the `ContainerInterface`.
 
-However, the adapter design pattern cannot be used to implement efficiently the `ParentAwareContainerInterface`. Indeed, to implement
-this interface, you need to modify the very behaviour of the object, and the adapter design pattern is not always well
+However, the adapter design pattern cannot be used to implement efficiently the "root" container. Indeed, to implement
+this interface, you need to modify the very behaviour of the container, and the adapter design pattern is not always well
 suited for this. 
 
 Also, there are other cases where the adapter design pattern is not enough. For instance, the Silex MVC microframework 

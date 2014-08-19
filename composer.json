@@ -16,7 +16,7 @@
 	"homepage" : "http://mouf-php.com",
 	"license" : "MIT",
 	"require" : {
-		"container-interop/container-interop" : "dev-parentaware",
+		"container-interop/container-interop" : "~1.0",
 		"pimple/pimple" : "~1.0"
 	},
 	"require-dev" : {
@@ -26,10 +26,5 @@
 		"psr-0" : {
 			"Interop\\Container\\Pimple" : "src/"
 		}
-	},
-	"repositories" : [{
-			"type" : "git",
-			"url" : "git@github.com:moufmouf/container-interop.git"
-		}
-	]
+	}
 }

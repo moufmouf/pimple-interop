@@ -11,7 +11,7 @@ use Interop\Container\ParentAwareContainerInterface;
  * 
  * @author David Négrier <david@mouf-php.com>
  */
-class PimpleInterop extends \Pimple implements ContainerInterface, ParentAwareContainerInterface {
+class PimpleInterop extends \Pimple implements ContainerInterface {
 
 	/**
 	 * @var ContainerInterface
@@ -50,6 +50,23 @@ class PimpleInterop extends \Pimple implements ContainerInterface, ParentAwareCo
 	 */
 	public function setMode($mode) {
 		$this->mode = $mode;
+	}
+	
+	/**
+	 * Instantiate the container.
+	 *
+	 * Objects and parameters can be passed as argument to the constructor.
+	 * 
+	 * @param ContainerInterface $container The root container of the application (if any)
+	 * @param array $values The parameters or objects.
+	 */
+	public function __construct(ContainerInterface $container = null, array $values = array())
+	{
+		parent::__construct($values);
+		if ($container) {
+			$this->fallbackContainer = $container;
+			$this->wrappedFallbackContainer = new FallbackContainerAdapter($container);
+		}
 	}
 	
 	/**
@@ -128,13 +145,5 @@ class PimpleInterop extends \Pimple implements ContainerInterface, ParentAwareCo
 	 */
 	public function has($identifier) {
 		return $this->offsetExists($identifier);
-	}
-
-	/* (non-PHPdoc)
-	 * @see \Interop\Container\ParentAwareContainerInterface::setParentContainer()
-	 */
-	public function setParentContainer(ContainerInterface $container) {
-		$this->fallbackContainer = $container;
-		$this->wrappedFallbackContainer = new FallbackContainerAdapter($container);
 	}
 }

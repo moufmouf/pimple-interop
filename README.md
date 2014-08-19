@@ -47,3 +47,11 @@ is directly extending the Pimple class. We could fork the Silex MVC microframewo
 to make it use PimpleInterop instead of Pimple easily. However, it would be almost impossible for Silex 
 to use the adapted Pimple instance from Acclimate (because Silex relies on all the methods of Pimple that are not implemented
 by the adapter).
+
+More about the ParentAwareContainerInterface implementation
+-----------------------------------------------------------
+
+The `ParentAwareContainerInterface` states that:
+
+- When an instance is 
+TODO: finish this: speak about the 2 modes

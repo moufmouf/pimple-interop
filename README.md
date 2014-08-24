@@ -18,7 +18,7 @@ another container. Dependencies will be fetched from the "root" container rather
 Here is a sample chaining 2 Pimple instances (in the real world, you would rather chain Pimple with a composite container than contains
 all the DI containers you are working with):
 
-```
+```php
 // Let's declare a first container
 $pimpleParent = new PimpleInterop();
 $pimpleParent['hello'] = 'world';

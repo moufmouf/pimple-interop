@@ -1,5 +1,9 @@
 Pimple-interop
 ==============
+[![Latest Stable Version](https://poser.pugx.org/mouf/pimple-interop/v/stable.svg)](https://packagist.org/packages/mouf/pimple-interop)
+[![Latest Unstable Version](https://poser.pugx.org/mouf/pimple-interop/v/unstable.svg)](https://packagist.org/packages/mouf/pimple-interop)
+[![License](https://poser.pugx.org/mouf/pimple-interop/license.svg)](https://packagist.org/packages/mouf/pimple-interop)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/98d5c42d-9d46-4e73-936d-6eac8b92b3c3/mini.png)](https://insight.sensiolabs.com/projects/98d5c42d-9d46-4e73-936d-6eac8b92b3c3)
 
 This package contains an extension to the [Pimple DI container](http://pimple.sensiolabs.org/) that makes Pimple 1 compatible with the [container-interop](https://github.com/container-interop/container-interop) API.
 

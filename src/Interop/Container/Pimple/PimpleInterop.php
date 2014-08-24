@@ -2,7 +2,6 @@
 namespace Interop\Container\Pimple;
 
 use Interop\Container\ContainerInterface;
-use Interop\Container\ParentAwareContainerInterface;
 
 /**
  * This class extends the Pimple class.

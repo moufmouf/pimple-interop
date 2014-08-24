@@ -2,7 +2,6 @@
 namespace Interop\Container\Pimple;
 
 use Interop\Container\ContainerInterface;
-use Interop\Container\ParentAwareContainerInterface;
 
 /**
  * This class wraps a container into an object that can be used as an array
@@ -71,25 +70,23 @@ class FallbackContainerAdapter implements \ArrayAccess, ContainerInterface {
 	}
 
 	/**
-	 * Not available in fallback container
+	 * Forwarded to Pimple original container (although it should be avoided)
 	 *
 	 * @param string $id    The unique identifier for the parameter or object
 	 * @param mixed  $value The value of the parameter or a closure to defined an object
 	 */
 	public function offsetSet($id, $value)
 	{
-		// TODO: we could fallback to the original Pimple here.
-		// same thing in __call.
-		throw new \Exception("Setting an instance in a root container is not allowed. You can only do that is pure Pimple containers.");
+		$this->container->offsetSet($id, $value);
 	}
 	
 	/**
-	 * Not available in fallback container
+	 * Forwarded to Pimple original container (although it should be avoided)
 	 *
 	 * @param string $id The unique identifier for the parameter or object
 	 */
 	public function offsetUnset($id)
 	{
-		throw new \Exception("Unsetting an instance in a root container is not allowed. You can only do that is pure Pimple containers.");
+		$this->container->offsetUnset($id);
 	}
 }

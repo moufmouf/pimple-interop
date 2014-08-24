@@ -1,7 +1,7 @@
 Pimple-interop
 ==============
 
-This package contains an extension to the Pimple DI container that makes Pimple compatible with the [container-interop](https://github.com/container-interop/container-interop) API.
+This package contains an extension to the [Pimple DI container](http://pimple.sensiolabs.org/) that makes Pimple 1 compatible with the [container-interop](https://github.com/container-interop/container-interop) API.
 
 How to use it?
 --------------
@@ -11,8 +11,8 @@ you can access your Pimple entries by using the `get` and `has` methods.
 `PimpleInterop` constructor accepts an optional "root" container as a first argument. This means you can chain `PimpleInterop` with
 another container. Dependencies will be fetched from the "root" container rather than from PimpleInterop.
 
-Here is a sample chaining 2 Pimple instances (in the real world, you would rather chain Pimple with another DI container,
-of course:
+Here is a sample chaining 2 Pimple instances (in the real world, you would rather chain Pimple with a composite container than contains
+all the DI containers you are working with):
 
 ```
 // Let's declare a first container
@@ -20,13 +20,16 @@ $pimpleParent = new PimpleInterop();
 $pimpleParent['hello'] = 'world';
 
 // Let's declare another container
+// Please note the "parent" container is passed in parameter of the constructor.
 $pimple = new PimpleInterop($pimpleParent);
 $pimple['test']->share(function(ContainerInterop $container) {
 	return "Hello ".$container->get('hello');
 });
 
 // Prints "Hello world".
-echo $pimple->get('hello');
+echo $pimple->get('test');
+// Prints "Hello world" too.
+echo $pimple['test'];
 ```
 
 Why the need for this package?
@@ -36,14 +39,14 @@ make sure that multiple containers can communicate together by sharing entries (
 container, etc...)
 
 
-But can't we already do this?
------------------------------
-The excellent [Acclimate](https://github.com/jeremeamia/acclimate-container) can already provide an adapter around Pimple.
+But can't we already do this using Acclimate?
+---------------------------------------------
+The excellent [Acclimate library](https://github.com/jeremeamia/acclimate-container) can already provide an adapter around Pimple.
 The adapter implements the `ContainerInterface`.
 
-However, the adapter design pattern cannot be used to implement efficiently the "root" container. Indeed, to implement
-this interface, you need to modify the very behaviour of the container, and the adapter design pattern is not always well
-suited for this. 
+However, the adapter design pattern cannot be used to have Pimple delegate its dependencies fetching to another
+container. Indeed, to implement this feature, you need to modify the very behaviour of the container, 
+and the adapter design pattern is not always well suited for this. 
 
 Also, there are other cases where the adapter design pattern is not enough. For instance, the Silex MVC microframework 
 is directly extending the Pimple class. We could fork the Silex MVC microframework 

@@ -17,9 +17,15 @@ class DelegateLookupContainerAdapter implements \ArrayAccess, ContainerInterface
 	 * @var ContainerInterface
 	 */
 	protected $container;
-	
-	public function __construct(ContainerInterface $container) {
+
+	/**
+	 * @var \Pimple
+	 */
+	protected $pimpleFallback;
+
+	public function __construct(ContainerInterface $container, \Pimple $pimpleFallback) {
 		$this->container = $container;
+		$this->pimpleFallback = $pimpleFallback;
 	}
 	
 	/**
@@ -77,7 +83,7 @@ class DelegateLookupContainerAdapter implements \ArrayAccess, ContainerInterface
 	 */
 	public function offsetSet($id, $value)
 	{
-		$this->container->offsetSet($id, $value);
+		$this->pimpleFallback->offsetSet($id, $value);
 	}
 	
 	/**
@@ -87,6 +93,6 @@ class DelegateLookupContainerAdapter implements \ArrayAccess, ContainerInterface
 	 */
 	public function offsetUnset($id)
 	{
-		$this->container->offsetUnset($id);
+		$this->pimpleFallback->offsetUnset($id);
 	}
 }

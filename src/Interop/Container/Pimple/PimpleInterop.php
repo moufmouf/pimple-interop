@@ -35,7 +35,7 @@ class PimpleInterop extends \Pimple implements ContainerInterface {
 		parent::__construct($values);
 		if ($container) {
 			$this->delegateLookupContainer = $container;
-			$this->wrappedDelegateLookupContainer = new DelegateLookupContainerAdapter($container);
+			$this->wrappedDelegateLookupContainer = new DelegateLookupContainerAdapter($container, $this);
 		} else {
 			$this->wrappedDelegateLookupContainer = $this;
 		}

@@ -106,7 +106,13 @@ class PimpleInterop extends \Pimple implements ContainerInterface {
 	{
 		if (!$this->fallbackContainer || $this->mode == self::MODE_STANDARD_COMPLIANT) {
 			try {
-				return parent::offsetGet($id);
+				if (!array_key_exists($id, $this->values)) {
+					throw new PimpleNotFoundException(sprintf('Identifier "%s" is not defined.', $id));
+				}
+
+				$isFactory = is_object($this->values[$id]) && method_exists($this->values[$id], '__invoke');
+
+				return $isFactory ? $this->values[$id]($this->wrappedFallbackContainer) : $this->values[$id];
 			} catch (\InvalidArgumentException $e) {
 				// To respect container-interop, let's wrap the exception.
 				throw new PimpleNotFoundException($e->getMessage(), $e->getCode(), $e);

@@ -31,17 +31,7 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($pimple->has('hello'));
 		$this->assertFalse($pimple->has('world'));
 	}
-	
-	public function testSetParentContainer() {
-		$pimpleParent = new PimpleInterop();
-		$pimpleParent['hello'] = 'world';
-		
-		$pimple = new PimpleInterop($pimpleParent);
-		
-		$this->assertEquals('world', $pimple->get('hello'));
-		$this->assertTrue($pimple->has('hello'));
-		$this->assertFalse($pimple->has('world'));
-	}
+
 	
 	/**
 	 * @expectedException Interop\Container\Pimple\PimpleNotFoundException
@@ -63,7 +53,10 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		
 		$pimple->get('hello');
 	}
-	
+
+	/**
+	 * @expectedException Interop\Container\Pimple\PimpleNotFoundException
+	 */
 	public function testChainedContainers() {
 		$pimpleGrandParent = new PimpleInterop();
 		$pimpleGrandParent['hello'] = 'world';
@@ -71,10 +64,8 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		$pimpleParent = new PimpleInterop($pimpleGrandParent);
 				
 		$pimple = new PimpleInterop($pimpleParent);
-		
-		$this->assertEquals('world', $pimple->get('hello'));
-		$this->assertTrue($pimple->has('hello'));
-		$this->assertFalse($pimple->has('world'));
+
+		$pimple->get('hello');
 	}
 
 	public function testPriority() {
@@ -103,12 +94,7 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		
 		// Let's get the controller from the composite container
 		$controller = $compositeContainer->get('controller');
-		$this->assertEquals('myDependency', $controller['result']);	
-		
-		// Let's get the controller from PimpleA (that does not declare it)
-		$controller = $pimpleA->get('controller');
 		$this->assertEquals('myDependency', $controller['result']);
-		
 	}
 	
 	/**
@@ -139,8 +125,6 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 		$compositeContainer->addContainer($pimpleA);
 		$compositeContainer->addContainer($pimpleB);
 
-		$pimpleA->setMode(PimpleInterop::MODE_STANDARD_COMPLIANT);
-
 		// Let's get the controller from PimpleA (that does not declare it)
 		// This should fail
 		$controller = $pimpleA->get('controller');
@@ -158,9 +142,6 @@ class PimpleInteropTest extends \PHPUnit_Framework_TestCase {
 
 		$pimpleA = new PimpleInterop($compositeContainer);
 		$pimpleB = new PimpleInterop($compositeContainer);
-
-		$pimpleA->setMode(PimpleInterop::MODE_STANDARD_COMPLIANT);
-		$pimpleB->setMode(PimpleInterop::MODE_STANDARD_COMPLIANT);
 
 		$pimpleB['controller'] = $pimpleB->share(function (ContainerInterface $rootContainer) use ($compositeContainer) {
 			return ['result' => $rootContainer->get('dependency')];

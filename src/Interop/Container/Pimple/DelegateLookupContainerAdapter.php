@@ -6,12 +6,12 @@ use Interop\Container\ContainerInterface;
 /**
  * This class wraps a container into an object that can be used as an array
  * (therefore as Pimple).
- * It is used with the fallback container.
- * This way, the fallback container can be accessed using the $container['instance'] notation. 
+ * It is used with the delegate container container.
+ * This way, the delegate container container can be accessed using the $container['instance'] notation.
  *  
  * @author David Négrier <david@mouf-php.com>
  */
-class FallbackContainerAdapter implements \ArrayAccess, ContainerInterface {
+class DelegateLookupContainerAdapter implements \ArrayAccess, ContainerInterface {
 
 	/**
 	 * @var ContainerInterface

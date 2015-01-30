@@ -26,7 +26,7 @@ $pimpleParent['hello'] = 'world';
 // Let's declare another container
 // Please note the "parent" container is passed in parameter of the constructor.
 $pimple = new PimpleInterop($pimpleParent);
-$pimple['test']->share(function(ContainerInterop $container) {
+$pimple['test'] = $pimple->share(function(ContainerInterop $container) {
 	return "Hello ".$container->get('hello');
 });
 

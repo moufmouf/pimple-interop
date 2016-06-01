@@ -26,5 +26,8 @@
 		"psr-0" : {
 			"Interop\\Container\\Pimple" : "src/"
 		}
+	},
+	"provide": {
+		"container-interop/container-interop-implementation": "^1.0"
 	}
 }
